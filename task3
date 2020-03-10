@@ -1,0 +1,99 @@
+/*https://contest.yandex.ru/contest/17228/run-report/31419624/ */
+#include <vector>
+#include <set>
+#include "iostream"
+
+void dfs1(int v,
+          std::vector<std::vector<int>> &graph,
+          std::vector<bool> &used,
+          std::vector<int> &order) {
+  used[v] = true;
+  for (int u : graph[v]) {
+    if (!used[u]) {
+      dfs1(u, graph, used, order);
+    }
+  }
+  order.push_back(v);
+}
+
+void dfs2(int v,
+          std::vector<std::vector<int>> &invgraph,
+          std::vector<bool> &used,
+          std::vector<int> &component) {
+  used[v] = true;
+  component.push_back(v);
+  for (int u : invgraph[v]) {
+    if (!used[u]) {
+      dfs2(u, invgraph, used, component);
+    }
+  }
+}
+int main() {
+  int n, m, a, b, i;
+  std::cin >> n >> m;
+  std::vector<std::vector<int>> graph(n, std::vector<int>());
+  std::vector<std::vector<int>> invgraph(n, std::vector<int>());
+  std::vector<bool> used;
+  std::vector<int> order;
+  std::vector<int> color(n);
+  std::vector<int> component;
+  std::vector<std::set<int>> condens_graph;
+  for (i = 0; i < m; ++i) {
+    std::cin >> a >> b;
+    a--; b--;
+    if (a == b) {
+      continue;
+    }
+    graph[a].push_back(b);
+    invgraph[b].push_back(a);
+  }
+  used.assign(n, false);
+  for (i = 0; i < n; ++i) {
+    if (!used[i]) {
+      dfs1(i, graph, used, order);
+    }
+  }
+  int c = 0;
+  used.assign(n, false);
+  for (i = 0; i < n; ++i) {
+    int v = order[n-i-1];
+    if (!used[v]) {
+      dfs2(v, invgraph, used, component);
+      for (int u : component) {
+        color[u] = c;
+      }
+      component.clear();
+      c++;
+    }
+  }
+  order.clear();
+  if (c == 1) {
+    std::cout << 0;
+    return 0;
+  }
+  condens_graph.resize(c);
+  for (int i = 0; i < n; i++) {
+    for (int u : graph[i]) {
+      if (color[u] != color[i]) {
+        condens_graph[color[i]].insert(color[u]);
+      }
+    }
+  }
+  std::vector<std::pair<bool, bool>> in_out(c, std::make_pair(true, true));
+  for (i = 0; i < c; ++i) {
+    if (!condens_graph[i].empty())
+      in_out[i].first = false;
+    for (auto u : condens_graph[i]) {
+      in_out[u].second = false;
+    }
+  }
+  int x = 0, y = 0;
+  for (i = 0; i < c; ++i) {
+    if (in_out[i].first)
+      x++;
+    if (in_out[i].second)
+      y++;
+  }
+  std::cout << std::max(x, y);
+  return 0;
+}
