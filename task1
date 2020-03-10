@@ -1,0 +1,46 @@
+/*https://contest.yandex.ru/contest/17228/run-report/31088327/ */
+#include <vector>
+#include <queue>
+#include <iostream>
+void bfs(std::vector<std::vector<int>> &g, int &start, std::vector<int> &dist) {
+  std::queue <int> q;
+  dist[start] = 0;
+  q.push(start);
+  while (!q.empty()) {
+    int w = q.front();
+    q.pop();
+    for (int i = 0; i < g[w].size(); ++i) {
+      if (dist[g[w][i]] == 1000001) {
+        dist[g[w][i]] = dist[w] + 1;
+        q.push(g[w][i]);
+      }
+    }
+  }
+}
+int main() {
+  int m, n, a, b, i, milk, leon, matilda;
+  std::cin >> n >> m >> leon >> matilda >> milk;
+  leon--; matilda--; milk--;
+  std::vector<std::vector<int>> g(n, std::vector<int>());
+  std::vector<int> matildadist(n, 1000001);
+  std::vector<int> leondist(n, 1000001);
+  std::vector<int> milkdist(n, 1000001);
+  for (i = 0; i < m; ++i) {
+    std::cin >> a >> b;
+    a--;
+    b--;
+    g[a].push_back(b);
+    g[b].push_back(a);
+  }
+  bfs(g, matilda, matildadist);
+  bfs(g, leon, leondist);
+  bfs(g, milk, milkdist);
+  int mina = matildadist[0] + leondist[0] + milkdist[0];
+  for (i = 0; i < n; ++i) {
+    if (mina > matildadist[i] + leondist[i] + milkdist[i]) {
+      mina = matildadist[i] + leondist[i] + milkdist[i];
+    }
+  }
+  std::cout << mina;
+  return 0;
+}
