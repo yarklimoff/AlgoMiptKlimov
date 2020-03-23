@@ -1,0 +1,360 @@
+#include <vector>
+#include <string>
+#include <iostream>
+class BigInteger {
+ public:
+  class divide_by_zero: public std::exception {  };
+  BigInteger();
+  BigInteger(std::string);
+  BigInteger(int);
+  friend std::ostream& operator <<(std::ostream&, const BigInteger&);
+  friend std::istream& operator >>(std::istream&, BigInteger&);
+  std::string toString() const;
+  const BigInteger operator +() const;
+  const BigInteger operator -() const;
+  const BigInteger operator ++();
+  const BigInteger operator ++(int);
+  const BigInteger operator --();
+  const BigInteger operator --(int);
+  bool operator ==(const BigInteger&) const;
+  bool operator <(const BigInteger&) const;
+  bool operator !=(const BigInteger&);
+  bool operator <=(const BigInteger&);
+  bool operator >(const BigInteger&);
+  bool operator >=(const BigInteger&);
+  const BigInteger operator +(const BigInteger&) const;
+  BigInteger& operator +=(const BigInteger&);
+  const BigInteger operator -(const BigInteger&) const;
+  BigInteger& operator -=(const BigInteger&);
+  const BigInteger operator *(const BigInteger&) const;
+  BigInteger& operator *=(const BigInteger&);
+  const BigInteger operator /(const BigInteger&) const;
+  BigInteger& operator /=(const BigInteger&);
+  const BigInteger operator %(const BigInteger&);
+  BigInteger& operator %=(const BigInteger&);
+  operator bool();
+ private:
+  static const int BASE = 1000000000;
+  std::vector<int> digits;
+  bool is_negative;
+  void remove_leading_zeros();
+  void shift_right();
+};
+BigInteger::operator bool() {
+  if (this->digits.size() > 0)
+    return true;
+  return false;
+}
+BigInteger::BigInteger() {
+  this->is_negative = false;
+}
+BigInteger::BigInteger(std::string str) {
+  if (str.length() == 0) {
+    this->is_negative = false;
+  }
+  else {
+    if (str[0] == '-') {
+      str = str.substr(1);
+      this->is_negative = true;
+    }
+    else {
+      this->is_negative = false;
+    }
+
+    for (long long i = str.length(); i > 0; i -= 9) {
+      if (i < 9)
+        this->digits.push_back(atoi(str.substr(0, i).c_str()));
+      else
+        this->digits.push_back(atoi(str.substr(i - 9, 9).c_str()));
+    }
+
+    this->remove_leading_zeros();
+  }
+}
+void BigInteger::remove_leading_zeros() {
+  while (this->digits.size() > 1 && this->digits.back() == 0) {
+    this->digits.pop_back();
+  }
+
+  if (this->digits.size() == 1 && this->digits[0] == 0)
+    this->is_negative = false;
+}
+std::ostream& operator <<(std::ostream& os, const BigInteger& bi) {
+  if (bi.digits.empty()) os << 0;
+  else {
+    if (bi.is_negative)
+      os << '-';
+    os << bi.digits.back();
+    char old_fill = os.fill('0');
+    for (long long i = static_cast<long long>(bi.digits.size()) - 2; i >= 0; --i) {
+      std::string nulls = "";
+      for (size_t k = 1; k <= 9 - std::to_string(bi.digits[i]).length(); ++k) {
+        nulls += "0";
+      }
+      os << nulls << bi.digits[i];
+    }
+    os.fill(old_fill);
+  }
+  return os;
+}
+std::istream& operator >>(std::istream& is, BigInteger& bi) {
+  std::string s;
+  is >> s;
+  bi = BigInteger(s);
+  return is;
+}
+bool BigInteger::operator ==(const BigInteger& right) const {
+  BigInteger left=*this;
+  if (left.is_negative != right.is_negative)
+    return false;
+  if (left.digits.empty()) {
+    if (right.digits.empty() || (right.digits.size() == 1 && right.digits[0] == 0))
+      return true;
+    else
+      return false;
+  }
+
+  if (right.digits.empty()) {
+    if (left.digits.size() == 1 && left.digits[0] == 0)
+      return true;
+    else
+      return false;
+  }
+
+  if (left.digits.size() != right.digits.size())
+    return false;
+  for (size_t i = 0; i < left.digits.size(); ++i) if (left.digits[i] != right.digits[i])
+    return false;
+
+  return true;
+}
+bool operator ==(int &left, BigInteger& right) {
+  return BigInteger(left) == right;
+}
+const BigInteger BigInteger::operator -() const {
+  BigInteger copy(*this);
+  copy.is_negative = !copy.is_negative;
+  return copy;
+}
+bool BigInteger::operator <(const BigInteger& right) const {
+  BigInteger left = *this;
+  if (left == right)
+    return false;
+  if (left.is_negative) {
+    if (right.is_negative)
+      return ((-right) < (-left));
+    else
+      return true;
+  }
+  else
+    if (right.is_negative)
+      return false;
+  else {
+    if (left.digits.size() != right.digits.size()) {
+      return left.digits.size() < right.digits.size();
+    }
+    else {
+      for (long long i = left.digits.size() - 1; i >= 0; --i) {
+        if (left.digits[i] != right.digits[i])
+          return left.digits[i] < right.digits[i];
+      }
+
+      return false;
+    }
+  }
+}
+bool BigInteger::operator !=(const BigInteger& right) {
+  BigInteger left = *this;
+  return !(left == right);
+}
+bool BigInteger::operator <=(const BigInteger& right) {
+  BigInteger left = *this;
+  return (left < right || left == right);
+}
+bool BigInteger::operator >(const BigInteger& right) {
+  BigInteger left = *this;
+  return !(left <= right);
+}
+bool operator >(int left, const BigInteger& right) {
+  return BigInteger(left) > right;
+}
+bool BigInteger::operator >=(const BigInteger& right) {
+  BigInteger left = *this;
+  return !(left < right);
+}
+bool operator >=(int left, const BigInteger& right) {
+  return BigInteger(left) >= right;
+}
+const BigInteger BigInteger::operator +(const BigInteger& right) const {
+  BigInteger left = *this;
+  if (left.is_negative) {
+    if (right.is_negative)
+      return -(-left + (-right));
+    else
+      return right - (-left);
+  }
+  else
+    if (right.is_negative)
+      return left - (-right);
+  int carry = 0;
+  for (size_t i = 0; i < std::max(left.digits.size(), right.digits.size()) || carry != 0; ++i) {
+    if (i == left.digits.size())
+      left.digits.push_back(0);
+    left.digits[i] += carry + (i < right.digits.size() ? right.digits[i] : 0);
+    carry = left.digits[i] >= BigInteger::BASE;
+    if (carry != 0)
+      left.digits[i] -= BigInteger::BASE;
+  }
+
+  return left;
+}
+const BigInteger operator +(int left, const BigInteger& right) {
+  return BigInteger(left) + right;
+}
+BigInteger& BigInteger::operator +=(const BigInteger& value) {
+  return *this = (*this + value);
+}
+const BigInteger BigInteger::operator++() {
+  return (*this += BigInteger(1));
+}
+std::string BigInteger::toString() const {
+  std::string s = "";
+  if (this->is_negative)
+    s += "-";
+  s += std::to_string(this->digits.back());
+  for (int i = this->digits.size() - 2; i >= 0; --i) {
+    for (int k = 0; k + std::to_string(this->digits[i]).length() < 9; ++k) {
+      s += "0";
+    }
+    s += std::to_string(this->digits[i]);
+  }
+  return s;
+}
+BigInteger::BigInteger(int i) {
+  if (i < 0)
+    this->is_negative = true;
+  else
+    this->is_negative = false;
+  this->digits.push_back(std::abs(i) % BigInteger::BASE);
+  i /= BigInteger::BASE;
+  if (i != 0)
+    this->digits.push_back(std::abs(i));
+}
+const BigInteger BigInteger::operator ++(int) {
+  *this += BigInteger(1);
+  return *this - BigInteger(1);
+}
+const BigInteger BigInteger::operator --() {
+  return *this -= BigInteger(1);
+}
+const BigInteger BigInteger::operator --(int) {
+  *this -= BigInteger(1);
+  return *this + BigInteger(1);
+}
+const BigInteger BigInteger::operator -(const BigInteger& right) const {
+  BigInteger left = *this;
+  if (right.is_negative)
+    return left + (-right);
+  else
+    if (left.is_negative)
+      return -(-left + right);
+  else
+    if (left < right)
+      return -(right - left);
+  int carry = 0;
+  for (size_t i = 0; i < right.digits.size() || carry != 0; ++i) {
+    left.digits[i] -= carry + (i < right.digits.size() ? right.digits[i] : 0);
+    carry = left.digits[i] < 0;
+    if (carry != 0)
+      left.digits[i] += BigInteger::BASE;
+  }
+
+  left.remove_leading_zeros();
+  return left;
+}
+const BigInteger operator -(int left, const BigInteger& right) {
+  return BigInteger(left) - right;
+}
+BigInteger& BigInteger::operator -=(const BigInteger& value) {
+  return *this = (*this - value);
+}
+const BigInteger BigInteger::operator *(const BigInteger& right) const {
+  BigInteger left = *this;
+  BigInteger result;
+  result.digits.resize(left.digits.size() + right.digits.size());
+  for (size_t i = 0; i < left.digits.size(); ++i) {
+    int carry = 0;
+    for (size_t j = 0; j < right.digits.size() || carry != 0; ++j) {
+      long long cur = result.digits[i + j] +
+          left.digits[i] * 1LL * (j < right.digits.size() ? right.digits[j] : 0) + carry;
+      result.digits[i + j] = static_cast<int>(cur % BigInteger::BASE);
+      carry = static_cast<int>(cur / BigInteger::BASE);
+    }
+  }
+
+  result.is_negative = left.is_negative != right.is_negative;
+  result.remove_leading_zeros();
+  return result;
+}
+const BigInteger operator *(int& left, const BigInteger& right) {
+  return BigInteger(left) * right;
+}
+BigInteger& BigInteger::operator *=(const BigInteger& value) {
+  return *this = (*this * value);
+}
+void BigInteger::shift_right() {
+  if (this->digits.size() == 0) {
+    this->digits.push_back(0);
+    return;
+  }
+  this->digits.push_back(this->digits[this->digits.size() - 1]);
+  for (size_t i = this->digits.size() - 2; i > 0; --i) this->digits[i] = this->digits[i - 1];
+  this->digits[0] = 0;
+}
+const BigInteger BigInteger::operator /(const BigInteger& right) const {
+  BigInteger left = *this;
+  if (right == BigInteger(0))
+    throw BigInteger::divide_by_zero();
+  BigInteger b = right;
+  b.is_negative = false;
+  BigInteger result, current;
+  result.digits.resize(left.digits.size());
+  for (long long i = static_cast<long long>(left.digits.size()) - 1; i >= 0; --i) {
+    current.shift_right();
+    current.digits[0] = left.digits[i];
+    current.remove_leading_zeros();
+    int x = 0, l = 0, r = BigInteger::BASE;
+    while (l <= r) {
+      int m = (l + r) / 2;
+      BigInteger t = b * BigInteger(m);
+      if (t <= current) {
+        x = m;
+        l = m + 1;
+      } else {
+        r = m - 1;
+      }
+    }
+
+    result.digits[i] = x;
+    current = current - b * BigInteger(x);
+  }
+
+  result.is_negative = left.is_negative != right.is_negative;
+  result.remove_leading_zeros();
+  return result;
+}
+const BigInteger operator /(int left, const BigInteger& right) {
+  return BigInteger(left)/right;
+}
+BigInteger& BigInteger::operator /=(const BigInteger& value) {
+  return *this = (*this / value);
+}
+const BigInteger BigInteger::operator %(const BigInteger& right) {
+  BigInteger left = *this;
+  BigInteger result = left - (left / right) * right;
+  if (result.is_negative) result += right;
+  return result;
+}
+BigInteger& BigInteger::operator %=(const BigInteger& value) {
+  return *this = (*this % value);
+}
