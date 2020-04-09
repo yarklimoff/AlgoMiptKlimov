@@ -36,7 +36,7 @@ void input(int& n, int& m, int& leon, int& matilda, int& milk, std::vector<std::
 }
 
 
-void solve(std::vector<std::vector<int>>& g, std::vector<int>& matildadist, std::vector<int>& leondist, std::vector<int>&     					 milkdist, int& leon, int& matilda, int& milk, int& n) {
+void solve(std::vector<std::vector<int>>& g, std::vector<int>& matildadist, std::vector<int>& leondist, std::vector<int>& milkdist, int& leon, int& matilda, int& milk, int& n) {
     bfs(g, matilda, matildadist);
     bfs(g, leon, leondist);
     bfs(g, milk, milkdist);
