@@ -27,7 +27,7 @@ void solve(std::vector<std::vector<edge>>& e, long& M, long& K, long& S, long& F
     long N = e.size();
     std::vector<std::vector<long>> dist(N, std::vector<long>(N, INF));
     dist[0][S] = 0;
-    for (long k = 0; k <= std::min(K, N - 3); ++k) {
+    for (long k = 0; k <= std::min(K, N - 2); ++k) {
         for (long v = 0; v < N; ++v) {
             for (auto i : e[v]) {
                     dist[k+1][v] = std::min(dist[k+1][v], dist[k][i.s] + i.p);
