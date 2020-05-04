@@ -6,23 +6,23 @@
 
 
 void read(std::vector<std::vector<std::bitset<CONS>>>& a, int& N) {
-    char s;
-    int k = 0, p = 0;
+    char symbol;
+    int  ones= 0, decades = 0;
     for (int i = 0; i < N; ++i) {
         a[i].push_back(std::bitset<CONS>());
-        k = 0;
-        p = 0;
+        ones = 0;
+        decades = 0;
         for (int j = 0; j < N; ++j) {
-            std::cin >> s;
-            if (k < CONS) {
-                a[i][p][k] = s - '0';
-                ++k;
+            std::cin >> symbol;
+            if (ones < CONS) {
+                a[i][decades][ones] = symbol - '0';
+                ++ones;
             } else {
-                k = 0;
-                ++p;
+                ones = 0;
+                ++decades;
                 a[i].push_back(std::bitset<CONS>());
-                a[i][p][k] = s - '0';
-                ++k;
+                a[i][decades][ones] = symbol - '0';
+                ++ones;
             }
         }
     }
