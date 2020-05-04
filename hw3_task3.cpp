@@ -17,24 +17,24 @@ bool cmp(Edge a, Edge b) {
     return a.weight < b.weight;
 }
 
-long long get_parent(long long x, std::vector<long long>& p) {
+long long getParent(long long x, std::vector<long long>& p) {
     if (x == p[x]) {
         return x;
     } else {
-        return p[x] = get_parent(p[x], p);
+        return p[x] = getParent(p[x], p);
     }
 }
 
 bool merge(long long x, long long y, std::vector<long long>& p) {
-    x = get_parent(x, p);
-    y = get_parent(y, p);
+    x = getParent(x, p);
+    y = getParent(y, p);
     if (x == y)
         return false;
     p[x] = y;
     return true;
 }
 
-void find_MST(long long& n, std::vector<long long>& a, std::vector<Edge>& special) {
+void findMST(long long& n, std::vector<long long>& a, std::vector<Edge>& special) {
     long long ind_min_elem = 0;
     std::vector<long long> parent(n);
     for (long long i = 1; i < n; ++i) {
@@ -67,7 +67,7 @@ int main() {
         --special[i].start;
         --special[i].finish;
     }
-    find_MST(n, a, special);
+    findMST(n, a, special);
     return 0;
 }
 
