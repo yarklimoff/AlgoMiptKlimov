@@ -1,3 +1,4 @@
+// https://contest.yandex.ru/contest/17986/run-report/32752861/
 #include "algorithm"
 #include "iostream"
 #include "vector"
