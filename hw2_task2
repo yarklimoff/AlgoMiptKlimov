@@ -4,17 +4,17 @@
 #define INF 1000000
 
 
-struct edge {
+struct Edge {
     long s, p;
 };
 
 
-void fill(std::vector<std::vector<edge>>& e, long& M) {
+void readGraph(std::vector<std::vector<Edge>>& e, long& M) {
     long s, f, p;
     for (long i = 0; i < M; ++i) {
         std::cin >> s >> f >> p;
         --s; --f;
-        edge ed;
+        Edge ed;
         ed.s = s;
         ed.p = p;
         e[f].push_back(ed);
@@ -22,7 +22,7 @@ void fill(std::vector<std::vector<edge>>& e, long& M) {
 }
 
 
-void solve(std::vector<std::vector<edge>>& e, long& M, long& K, long& S, long& F) {
+void solve(std::vector<std::vector<Edge>>& e, long& M, long& K, long& S, long& F) {
     --S, --F;
     long N = e.size();
     std::vector<std::vector<long>> dist(N, std::vector<long>(N, INF));
@@ -30,27 +30,27 @@ void solve(std::vector<std::vector<edge>>& e, long& M, long& K, long& S, long& F
     for (long k = 0; k <= std::min(K, N - 2); ++k) {
         for (long v = 0; v < N; ++v) {
             for (auto i : e[v]) {
-                    dist[k+1][v] = std::min(dist[k+1][v], dist[k][i.s] + i.p);
+                dist[k+1][v] = std::min(dist[k+1][v], dist[k][i.s] + i.p);
             }
         }
     }
-    long mina = dist[0][F];
+    long min = dist[0][F];
     for (long i = 1; i <= std::min(K, N-1); ++i) {
-        mina = std::min(mina, dist[i][F]);
+        min = std::min(min, dist[i][F]);
     }
-    if (mina >= INF) {
+    if (min >= INF) {
         std::cout << -1 << std::endl;
     }
     else
-        std::cout << mina << std::endl;
+        std::cout << min << std::endl;
 }
 
 
 int main() {
     long N, M, K, S, F;
     std::cin >> N >> M >> K >> S >> F;
-    std::vector<std::vector<edge>> edges(N, std::vector<edge> ());
-    fill(edges, M);
+    std::vector<std::vector<Edge>> edges(N, std::vector<Edge> ());
+    readGraph(edges, M);
     solve(edges, M, K, S, F);
     return 0;
 }
