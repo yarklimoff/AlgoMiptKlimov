@@ -11,8 +11,8 @@ struct Edge {
     long start = 0, end = 0, weight = INF;
 };
 
-void find_easiest_edge(std::vector<std::vector<std::pair<long, long>>>& graph,
-        std::vector<Bool>& used, std::vector<long>& MST, Edge& curr_min_edge) {
+void findEasiestEdge(std::vector<std::vector<std::pair<long, long>>>& graph,
+                       std::vector<Bool>& used, std::vector<long>& MST, Edge& curr_min_edge) {
     curr_min_edge.weight = INF;
     for (long i : MST) {
         for (auto j : graph[i]) {
@@ -30,7 +30,7 @@ void find_easiest_edge(std::vector<std::vector<std::pair<long, long>>>& graph,
 }
 
 
-void build_MST(std::vector<std::vector<std::pair<long, long>>>& graph) {
+void buildMST(std::vector<std::vector<std::pair<long, long>>>& graph) {
     Edge curr_min_edge;
     std::vector<Bool> used(graph.size(), False);
     long min_weight = 0;
@@ -38,7 +38,7 @@ void build_MST(std::vector<std::vector<std::pair<long, long>>>& graph) {
     MST.push_back(0);
     used[0] = True;
     for (long i = 0; i < graph.size() - 1; ++i) {
-        find_easiest_edge(graph, used, MST, curr_min_edge);
+        findEasiestEdge(graph, used, MST, curr_min_edge);
         MST.push_back(curr_min_edge.end);
         min_weight += curr_min_edge.weight;
     }
@@ -59,7 +59,7 @@ int main() {
     for (i = 0; i < n; ++i) {
         sort(graph[i].begin(), graph[i].end());
     }
-    build_MST(graph);
+    buildMST(graph);
     return 0;
 }
 
