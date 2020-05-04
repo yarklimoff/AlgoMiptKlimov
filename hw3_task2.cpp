@@ -35,7 +35,7 @@ void unite(long& u, long& v, std::vector<long>& parent, std::vector<long>& rank)
     }
 }
 
-void build_MST(std::vector<Edge>& graph, long& n) {
+void buildMST(std::vector<Edge>& graph, long& n) {
     long min_weight = 0;
     std::vector<long> parent(n);
     std::vector<long> rank(n, 0);
@@ -63,7 +63,7 @@ int main() {
         graph.push_back(Edge(weight, start, end));
     }
     sort(graph.begin(), graph.end(), cmp);
-    build_MST(graph, n);
+    buildMST(graph, n);
     return 0;
 }
 
