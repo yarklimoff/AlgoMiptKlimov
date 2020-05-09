@@ -1,0 +1,67 @@
+// https://contest.yandex.ru/contest/17986/run-report/32900017/
+#include <iostream>
+#include <vector>
+
+enum Bool {False = 0, True};
+
+
+void mincut(std::vector<std::vector<int>>& graph) {
+    std::vector<int> best_cut;
+    int best_cost = 10000;
+    int n = graph.size();
+    std::vector<int> separate_verticals(n, 0);
+    std::vector<std::vector<int>> v(n);
+    for (int i = 0; i < n; ++i)
+        v[i].assign (1, i);
+    std::vector<Bool> exist(n, True);
+    for (int ph = 0; ph < n - 1; ++ph) {
+        std::vector<int> w(n, 0);
+        std::vector<Bool> in_a(n, False);
+        for (int it = 0, prev; it < n - ph; ++it) {
+            int sel = -1;
+            for (int i = 0; i < n; ++i)
+                if (exist[i] && !in_a[i] && (sel == -1 || w[i] > w[sel]))
+                    sel = i;
+            if (it == n - ph - 1) {
+                if (w[sel] < best_cost)
+                    best_cost = w[sel],  best_cut = v[sel];
+                v[prev].insert (v[prev].end(), v[sel].begin(), v[sel].end());
+                for (int i = 0; i < n; ++i)
+                    graph[prev][i] = graph[i][prev] += graph[sel][i];
+                exist[sel] = False;
+            }
+            else {
+                in_a[sel] = True;
+                for (int i = 0; i < n; ++i)
+                    w[i] += graph[sel][i];
+                prev = sel;
+            }
+        }
+    }
+    for (int i: best_cut) {
+        std::cout << i + 1 << " ";
+        separate_verticals[i] = 1;
+    }
+    std::cout << std::endl;
+    for (int i = 0; i < n; ++i) {
+        if (separate_verticals[i] == 0) {
+            std::cout << i + 1 << " ";
+        }
+    }
+}
+
+
+int main() {
+    int n;
+    char s;
+    std::cin >> n;
+    std::vector<std::vector<int>> graph(n, std::vector<int> (n, 0));
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            std::cin >> s;
+            graph[i][j] = s - '0';
+        }
+    }
+    mincut(graph);
+    return 0;
+}
