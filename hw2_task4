@@ -1,0 +1,64 @@
+//https://contest.yandex.ru/contest/17594/run-report/32147810/
+#include "iostream"
+#include "vector"
+#include "bitset"
+#define CONS 32
+
+
+void read(std::vector<std::vector<std::bitset<CONS>>>& a, int& N) {
+    char symbol;
+    int  ones= 0, decades = 0;
+    for (int i = 0; i < N; ++i) {
+        a[i].push_back(std::bitset<CONS>());
+        ones = 0;
+        decades = 0;
+        for (int j = 0; j < N; ++j) {
+            std::cin >> symbol;
+            if (ones < CONS) {
+                a[i][decades][ones] = symbol - '0';
+                ++ones;
+            } else {
+                ones = 0;
+                ++decades;
+                a[i].push_back(std::bitset<CONS>());
+                a[i][decades][ones] = symbol - '0';
+                ++ones;
+            }
+        }
+    }
+}
+
+
+void print(std::vector<std::vector<std::bitset<CONS>>>& a, int& N) {
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            std::cout << a[i][j / CONS][j % CONS];
+        }
+        std::cout << std::endl;
+    }
+}
+
+
+void solve(std::vector<std::vector<std::bitset<CONS>>>& a, int& N) {
+    for (int k = 0; k < N; ++k) {
+        for (int i = 0; i < N; ++i) {
+            if (a[i][k / CONS][k % CONS] == 1) {
+                for (int j = 0; j <= N / CONS; ++j) {
+                    a[i][j] = (a[i][j] | a[k][j]);
+                }
+            }
+        }
+    }
+    print(a, N);
+}
+
+
+
+int main() {
+    int N;
+    std::cin >> N;
+    std::vector<std::vector<std::bitset<CONS>>> a(N);
+    read(a, N);
+    solve(a, N);
+    return 0;
+}
