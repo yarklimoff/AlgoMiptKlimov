@@ -1,0 +1,65 @@
+// https://contest.yandex.ru/contest/18281/run-report/33086553/
+#include <math.h>
+#include <iostream>
+#include "vector"
+
+#define INF 10000000;
+
+
+int main() {
+    long long n, m, i, k, l, r;
+    std::cin >> n >> m;
+    std::vector<long long> a(n);
+    std::vector<std::vector<std::pair<long long, long long>>> T(ceil(log(n) / log(2)), std::vector<std::pair<long long, long long>>(n));
+    for (i = 0; i < n; ++i) {
+        std::cin >> a[i];
+        T[0][i].first = a[i];
+        T[0][i].second = i;
+    }
+    for (k = 1; k < ceil(log(n) / log(2)); ++k) {
+        for (i = 0; i < n && i + (1 << (k - 1)) < n; ++i) {
+            if (T[k - 1][i] < T[k - 1][i + (1 << (k - 1))]) {
+                T[k][i].first = T[k - 1][i].first;
+                T[k][i].second = T[k - 1][i].second;
+            } else {
+                T[k][i].first = T[k - 1][i + (1 << (k - 1))].first;
+                T[k][i].second = T[k - 1][i + (1 << (k - 1))].second;
+            }
+        }
+    }
+    for (i = 0; i < m; ++i) {
+        std::cin >> l >> r;
+        --l; --r;
+        k = floor(log(r - l + 1) / log(2));
+        if (T[k][l].first < T[k][r - (1 << k) + 1].first) {
+            long long new_l, new_r, new_k, first_candidate = INF;
+            long long second_candidate = INF;
+            new_r = T[k][l].second - 1;
+            if (new_r >= l) {
+                new_k = floor(log(new_r - l + 1) / log(2));
+                first_candidate = std::min(T[new_k][l].first, T[new_k][new_r - (1 << new_k) + 1].first);
+            }
+            new_l = T[k][l].second + 1;
+            if (new_l <= r) {
+                new_k = floor(log(r - new_l + 1) / log(2));
+                second_candidate = std::min(T[new_k][new_l].first, T[new_k][r - (1 << new_k) + 1].first);
+            }
+            std::cout << std::min(first_candidate, second_candidate) << std::endl;
+        } else {
+            long long new_l, new_r, new_k, first_candidate = INF;
+            long long second_candidate = INF;
+            new_r = T[k][r - (1 << k) + 1].second - 1;
+            if (new_r >= l) {
+                new_k = floor(log(new_r - l + 1) / log(2));
+                first_candidate = std::min(T[new_k][l].first, T[new_k][new_r - (1 << new_k) + 1].first);
+            }
+            new_l = T[k][r - (1 << k) + 1].second + 1;
+            if (new_l <= r) {
+                new_k = floor(log(r - new_l + 1) / log(2));
+                second_candidate = std::min(T[new_k][new_l].first, T[new_k][r - (1 << new_k) + 1].first);
+            }
+            std::cout << std::min(first_candidate, second_candidate) << std::endl;
+        }
+    }
+    return 0;
+}
