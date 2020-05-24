@@ -1,0 +1,77 @@
+// https://contest.yandex.ru/contest/18281/run-report/33180232/
+#include <iostream>
+#include <vector>
+#define INF 1000000
+
+void update(long curr, long L, long R, long l, long r, long X, std::vector<std::pair<long, long>>& tree) {
+    if (l > r) return;
+    if ((l == L) && (r == R)) {
+        tree[curr].second += X;
+    } else {
+        long m = (L + R) / 2;
+        update(curr * 2, L, m, l, std::min(r, m), X, tree);
+        update(curr * 2 + 1, m + 1, R, std::max(l, m + 1), r, X, tree);
+        tree[curr].first = std::min(tree[curr * 2].first - tree[curr * 2].second,
+                                    tree[curr * 2 + 1].first - tree[curr * 2 + 1].second);
+    }
+}
+
+long get(long curr, long L, long R, long l, long r, std::vector<std::pair<long, long>>& tree) {
+    if (l > r) {
+        return INF;
+    }
+    if ((l == L) && (r == R)) {
+        return tree[curr].first - tree[curr].second;
+    } else {
+        long m = (L + R) / 2;
+        return std::min(get(curr * 2, L, m, l, std::min(m, r), tree),
+                        get(curr * 2 + 1, m + 1, R, std::max(l, m + 1), r, tree)) -
+                        tree[curr].second;
+    }
+}
+
+bool query(long l, long r, long X, long size, std::vector<std::pair<long, long>>& tree) {
+    if (get(1, 0, size - 1, l, r, tree) >= X) {
+        update(1, 0, size - 1, l, r, X, tree);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void build(std::vector<long> &a, long curr, long l, long r, std::vector<std::pair<long, long>>& tree) {
+    if (l == r) {
+        tree[curr].first = a[l];
+    } else {
+        long m = (l + r) / 2;
+        build(a, curr * 2, l, m, tree);
+        build(a, curr * 2 + 1, m + 1, r, tree);
+        tree[curr].first = std::min(tree[curr * 2].first, tree[curr * 2 + 1].first);
+    }
+}
+
+int main() {
+    long N, m, capacity, start, end, count;
+    std::cin >> N;
+    --N;
+    std::vector<long> a(N, 0);
+    for (long i = 0; i < N; ++i) {
+        long e = 0;
+        std::cin >> e;
+        a[i] = -e;
+    }
+    std::cin >> capacity >> m;
+    for (long i = 0; i < N; ++i) {
+        a[i] += capacity;
+    }
+    std::vector<std::pair<long, long> > tree(4 * N, std::make_pair(INF, 0));
+    build(a, 1, 0, N - 1, tree);
+    for (long i = 0; i < m; ++i) {
+        std::cin >> start >> end >> count;
+        --end;
+        if (!query(start, end, count, N, tree)) {
+            std::cout << i << std::endl;
+        }
+    }
+    return 0;
+}
