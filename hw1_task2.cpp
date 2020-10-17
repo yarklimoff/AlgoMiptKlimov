@@ -1,61 +1,38 @@
-// https://contest.yandex.ru/contest/19772/run-report/35140076/
+// https://contest.yandex.ru/contest/19772/run-report/36813481/
 #include <iostream>
-#include "algorithm"
-#include "vector"
-#include "string"
+#include <vector>
+#include <numeric>
+#include <string>
+#include <functional>
 
-typedef long long ll;
-
-ll CountingPalindromesOfEvenLength(size_t n, std::string& s) {
-    std::vector<ll> even(n, 0);
-    ll left_bound = 0, right_bound = 0, ans = 0;
-    for (ll i = 0; i < n; i++) {
+long long CountingPalindromes(int a, const std::string& s) {
+    size_t n = s.length();
+    std::vector<int> counts_polindromes(n, 0);
+    int left_bound = 0, right_bound = 0;
+    for (int i = 0; i < n; ++i) {
         if (i < right_bound) {
-            even[i] = std::min(right_bound - i + 1,
-                              even[left_bound + right_bound - i + 1]);
+            counts_polindromes[i] = std::min(right_bound - i + a,
+                                             counts_polindromes[left_bound + right_bound - i + a]);
         }
-        while (i - even[i] - 1 >= 0 && i + even[i] < n &&
-               s[i - even[i] - 1] == s[i + even[i]]) {
-            ++even[i];
+        while (i - counts_polindromes[i] - 1 >= 0 && i + counts_polindromes[i] + (a^1)< n &&
+               s[i - counts_polindromes[i] - 1] == s[i + counts_polindromes[i] + (a^1)]) {
+            ++counts_polindromes[i];
         }
-        if (i + even[i] - 1 > right_bound) {
-            left_bound = i - even[i];
-            right_bound = i + even[i] - 1;
+        if (i + counts_polindromes[i] - a > right_bound) {
+            left_bound = i - counts_polindromes[i];
+            right_bound = i + counts_polindromes[i] - a;
         }
     }
-    for (size_t i = 0; i < n; ++i) {
-        ans += even[i];
-    }
+    long long ans = std::accumulate(counts_polindromes.begin(),
+                                    counts_polindromes.end(), 0LL);
     return ans;
 }
 
-ll CountingPalindromesOfOddLength(size_t n, std::string& s) {
-    std::vector<ll> odd(n, 0);
-    ll left_bound = 0, right_bound = 0, ans = 0;
-    for (ll i = 0; i < n; ++i) {
-        if (i < right_bound) {
-            odd[i] = std::min(right_bound - i,
-                               odd[left_bound + right_bound - i]);
-        }
-        while (i - odd[i] - 1 >= 0 && i + odd[i] + 1 < n &&
-               s[i - odd[i] - 1] == s[i + odd[i] + 1]) {
-            odd[i]++;
-        }
-        if (i + odd[i] > right_bound) {
-            left_bound = i - odd[i];
-            right_bound = i + odd[i];
-        }
-    }
-    for (size_t i = 0; i < n; ++i) {
-        ans += odd[i];
-    }
-    return ans;
-}
 
 int main() {
     std::string s;
     std::cin >> s;
-    std::cout << CountingPalindromesOfOddLength(s.size(), s) +
-                CountingPalindromesOfEvenLength(s.size(), s);
+    std::cout << CountingPalindromes(0, s) +
+                CountingPalindromes(1, s);
     return 0;
 }
