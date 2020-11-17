@@ -1,4 +1,4 @@
-// https://contest.yandex.ru/contest/20642/run-report/41610493/
+// https://contest.yandex.ru/contest/20642/run-report/41612074/
 
 #include <math.h>
 #include <algorithm>
@@ -9,7 +9,7 @@
 #define INF 1000000000LL
 
 class Point {
- public:
+public:
     long long x, y;
     Point();
     Point(long long _x, long long _y);
@@ -46,7 +46,7 @@ double dist(Point a, Point b) {
 }
 
 class Vector {
- public:
+public:
     long long x, y;
     Vector();
     Vector(long long a, long long b);
@@ -97,23 +97,9 @@ long long ScalarDot(Vector a, Vector b) {
     return a.x * b.x + a.y * b.y;
 }
 
-
-
-int main() {
-    int N;
+void ConvexHull(Point left, Point right, std::vector<Point>& points) {
+    int N = points.size();
     double ans = 0;
-    std::cin >> N;
-    std::vector<Point> points(N);
-    Point left = Point(INF, INF), right = Point(-INF, -INF);
-    for (int i = 0; i < N; ++i) {
-        std::cin >> points[i];
-        if (points[i] < left) {
-            left = points[i];
-        }
-        if (right < points[i]) {
-            right = points[i];
-        }
-    }
     std::vector<Point> up, down;
     up.push_back(left);
     down.push_back(left);
@@ -143,6 +129,23 @@ int main() {
         ans += dist(down[i], down[i + 1]);
     }
     std::cout << std::fixed << std::setprecision(10) << ans;
-    return 0;
 }
 
+
+int main() {
+    int N;
+    std::cin >> N;
+    std::vector<Point> points(N);
+    Point left = Point(INF, INF), right = Point(-INF, -INF);
+    for (int i = 0; i < N; ++i) {
+        std::cin >> points[i];
+        if (points[i] < left) {
+            left = points[i];
+        }
+        if (right < points[i]) {
+            right = points[i];
+        }
+    }
+    ConvexHull(left, right, points);
+    return 0;
+}
