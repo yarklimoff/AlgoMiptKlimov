@@ -1,1 +1,1 @@
-AlgoMiptKlimov
+Запускать g++ main.cpp
