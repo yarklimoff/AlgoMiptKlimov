@@ -4,7 +4,7 @@
 
 int Mex(std::vector <int>& to_mex) {
     int i = 0;
-    while (find(to_mex.begin(), to_mex.end(), i)!=to_mex.end()) {
+    while (find(to_mex.begin(), to_mex.end(), i) != to_mex.end()) {
         ++i;
     }
     return i;
@@ -26,7 +26,7 @@ int SpragueGrandy(int n, std::vector<int>& sg) {
 
 void WinSchtirlitz(int n, std::vector<int>& sg) {
     for (int i = 1; i <= n; ++i) {
-        if ((sg[i-1]^sg[n-i]) == 0) {
+        if ((sg[i - 1] ^ sg[n - i]) == 0) {
             std::cout << i << std::endl;
         }
     }
@@ -34,7 +34,7 @@ void WinSchtirlitz(int n, std::vector<int>& sg) {
 int main() {
     int n = 0;
     std::cin >> n;
-    std::vector<int> sg(n+1, -1);
+    std::vector<int> sg(n + 1, -1);
     sg[0] = 0;
     sg[1] = 0;
     sg[2] = 1;
