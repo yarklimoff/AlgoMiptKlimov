@@ -1,11 +1,10 @@
-// https://contest.yandex.ru/contest/20019/run-report/43269142/
 #include <iostream>
 #include <vector>
 #include <numeric>
 #include <functional>
 #define alphabet 123
 
-void Count(std::vector<int> &cnt, const std::string& s,
+void CountSort(std::vector<int> &cnt, const std::string& s,
            std::vector<int> &class_id, std::vector<int> &suf_array,
            int &classes, std::vector<int>& temp_suf_array) {
     size_t n = s.size();
@@ -20,9 +19,9 @@ void Count(std::vector<int> &cnt, const std::string& s,
     }
 }
 
-void Step(std::vector<int> &cnt, const std::string& s,
-           std::vector<int> &class_id, std::vector<int> &suf_array,
-           int &classes, std::vector<int>& temp_suf_array, std::vector<int>& temp_classes) {
+void Steps(std::vector<int> &cnt, const std::string& s,
+          std::vector<int> &class_id, std::vector<int> &suf_array,
+          int &classes, std::vector<int>& temp_suf_array, std::vector<int>& temp_classes) {
     size_t n = s.length();
     for (int len = 0; len < n; len = ((len == 0) ? 1 : 2 * len)) {
         for (int i = 0; i < n; ++i) {
@@ -32,7 +31,7 @@ void Step(std::vector<int> &cnt, const std::string& s,
             }
         }
         cnt = std::vector<int>(classes, 0);
-        Count(cnt, s, class_id, suf_array, classes, temp_suf_array);
+        CountSort(cnt, s, class_id, suf_array, classes, temp_suf_array);
         temp_classes[temp_suf_array[0]] = 0;
         classes = 1;
         for (int i = 1; i < n; ++i) {
@@ -58,7 +57,7 @@ std::vector<int> BuildSuffArray(const std::string& s) {
         suf_array[i] = i;
         class_id[i] = s[i];
     }
-    Step(cnt, s, class_id, suf_array, classes, temp_suf_array, temp_classes);
+    Steps(cnt, s, class_id, suf_array, classes, temp_suf_array, temp_classes);
     return suf_array;
 }
 
@@ -92,20 +91,23 @@ std::vector<int> BuildLCP(std::vector<int>& suf_array, const std::string& s) {
     return LCP;
 }
 
-void Solve(std::string& s) {
+long long Solve(std::string s) {
     std::vector<int> suff_array, LCP;
     s += '\0';
     size_t n = s.length();
     suff_array = BuildSuffArray(s);
     LCP = BuildLCP(suff_array, s);
-    long long ans = n * n - accumulate(suff_array.begin(), suff_array.end(), 0)
-                    - std::accumulate(LCP.begin(), LCP.end(), 0) - n;
-    std::cout << ans;
+    long long ans = 0.0;
+    for (int i = 0; i < n; ++i) {
+        ans += n - suff_array[i];
+    }
+    ans = ans - std::accumulate(LCP.begin(), LCP.end(), 0) - n;
+    return ans;
 }
 
 int main() {
     std::string s;
     std::cin >> s;
-    Solve(s);
+    std::cout << Solve(s);
     return 0;
 }
